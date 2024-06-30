@@ -9,7 +9,7 @@ MINES = 20
 START = (0, 0)
 GOAL = (9, 9)
 PROB = 0.9 # Probability that agent will select the most optimal move
-MAX_RESETS = 5000 # Reset limit when searching for solution
+MAX_RESETS = 500 # Reset limit when searching for solution
 
 def main():
     # Check that start and goal variables are valid:
@@ -111,6 +111,7 @@ def search(agent, reference):
     
     # If solution exists, return True, else return False
     if solution:
+        print(f"Hidden Minefield:\n{agent.field}")
         print(f"Most optimal solution (Cost={cost}) found after {(time() - start):.4f} seconds and {resets} resets:\n{solution}")
         return True
     print(f"\nNo path found after {elapsed:.4f} seconds.")
