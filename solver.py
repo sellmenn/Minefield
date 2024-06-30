@@ -5,11 +5,11 @@ from time import time
 from copy import deepcopy
 
 LENGTH = 10
-MINES = 20
+MINES = 25
 START = (0, 0)
 GOAL = (9, 9)
-PROB = 0.7 # Probability that agent will select the most optimal move
-MAX_RESETS = 10000 # Reset limit when searching for solution
+PROB = 0.9 # Probability that agent will select the most optimal move
+MAX_RESETS = 5000 # Reset limit when searching for solution
 
 def main():
     # Check that start and goal variables are valid:
@@ -25,17 +25,17 @@ def main():
     reference = Field(length=LENGTH, mines=0, start=START, goal=GOAL)
     # Create agent object
     agent = Agent(game)
-    # Search for path via reinforcement learning
     try:
+        # Search for path via reinforcement learning
         result = search(agent, reference)
     except EOFError:
         print("Search terminated.")
     if result:
-        print("Goal reached! Game ended.")
+        print("Solution found! Game ended.")
         return 0
     else:
         print(f"Hidden Minefield:\n{agent.field}")
-        print(f"Agent's map:\n{reference}")
+        print("No solution found!")
     
 def search(agent, reference):
     solution = None
@@ -50,17 +50,17 @@ def search(agent, reference):
     lowest_cost = abs(GOAL[0] - START[0]) + abs(GOAL[1] - START[1])
     # End loop if limit is exceeded
     while resets < MAX_RESETS:
-        # Mark the current position of the agent on the reference field as H
-        reference.mark_field(agent.position, "H")
+        # Mark current position of the agent on the reference field
+        reference.mark_field(agent.position, 1)
         # Add current position to path
         agent.path.append(agent.position)
 
         # Obtain list of all possible actions from current position
         actions = agent.actions()
         options = list()
-        # Remove actions which agent has previously already explored
+        # Remove actions which agent has already explored
         for action in actions:
-            if action not in agent.path:
+            if actions[action] not in agent.path:
                 options.append(actions[action])
 
         # With PROB probability, select the most optimal move from the list of moves in options. Else, select a random move.
@@ -69,8 +69,7 @@ def search(agent, reference):
             move = informed_action(agent, options)
         elif options:
             move = choices(options)[0]
-        # Before moving, mark the current position as 1 before moving to the next position
-        reference.mark_field(agent.position, 1)
+
         # Move agent to new position
         agent.move(move)
 
@@ -78,7 +77,7 @@ def search(agent, reference):
         if agent.check_goal():
             # Obtain cost of state
             new_cost = reference.count_marker(1)
-            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):")
+            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):\n{reference}\n")
             # Save solution if cost is lowest seen
             if new_cost < cost:
                 cost = new_cost
@@ -90,8 +89,8 @@ def search(agent, reference):
             reset(agent, reference)
             resets += 1
 
-        # If agent encountered mine or is stuck in a dead end
-        elif agent.check_mine() == 1 or not options:
+        # If agent encountered mine or dead end
+        if agent.check_mine() or not options:
             # Add move to unsafe list
             agent.unsafe.append(move)
             # Add move to reference field
@@ -107,7 +106,7 @@ def search(agent, reference):
         if path_length > longest_path or time() - last_update > 1:
             last_update = time()
             longest_path = path_length
-            print(f"Searching...    (Enter ctrl D to terminate search)\n{reference}")
+            print(f"Searching...\nCurrent position: {agent.position}\nActions: {options}\nPath: {agent.path}    (Enter ctrl D to terminate search)\n{reference}")
     
     # If solution exists, return True, else return False
     if solution:
@@ -141,7 +140,7 @@ def reset(agent, reference):
     # Move agent to start
     agent.move(START)
     # Reset path
-    agent.path.clear()
+    agent.path = list()
 
 if __name__ == "__main__":
     main()
