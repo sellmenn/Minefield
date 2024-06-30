@@ -31,9 +31,7 @@ def main():
         print(f"Agent's map:\n{reference}")
     
 def search(agent, reference):
-    # Initialise solution
     solution = None
-    goal = False
     # Save start time
     start = time()
     last_update = start
