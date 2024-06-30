@@ -90,7 +90,8 @@ def search(agent, reference):
             reference.mines.append(move)
             reset(agent, reference)
             resets += 1
-            # Update elapsed time
+            
+        # Update elapsed time
         elapsed = time() - start
         path_length = reference.count_marker(1)
         
