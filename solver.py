@@ -12,6 +12,13 @@ PROB = 0.7 # Probability that agent will select the most optimal move
 MAX_RESETS = 10000 # Reset limit when searching for solution
 
 def main():
+    # Check that start and goal variables are valid:
+    for x, y in [START, GOAL]:
+        if 0 <= x < LENGTH and 0 <= y < LENGTH:
+            pass
+        else:
+            print("Invalid start or goal coordinates. Check global variables.")
+            return 1
     # Create field with mines
     game = Field(length=LENGTH, mines=MINES, start=START, goal=GOAL)
     # Create reference field with no mines, for marking
@@ -40,7 +47,7 @@ def search(agent, reference):
     longest_path = 0
     cost = agent.field.length ** 2
     # Lowest theoretically possible cost
-    lowest_cost = 2 * (LENGTH) - 2
+    lowest_cost = abs(GOAL[0] - START[0]) + abs(GOAL[1] - START[1])
     # End loop if limit is exceeded
     while resets < MAX_RESETS:
         # Mark the current position of the agent on the reference field as H
