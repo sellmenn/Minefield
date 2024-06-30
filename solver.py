@@ -64,10 +64,11 @@ def search(agent, reference):
         reference.mark_field(agent.position, 1)
         # Move agent to new position
         agent.move(move)
-        # If agent has reached the goal state, return 0
+        # If agent has reached the goal state
         if agent.check_goal():
             print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):")
             new_cost = reference.count_marker(1)
+            # If solution is the most optimal, save solution
             if new_cost < cost:
                 cost = new_cost
                 solution = deepcopy(reference)
