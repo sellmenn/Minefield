@@ -2,13 +2,14 @@ from field import Field
 from agent import Agent
 from random import choices
 from time import time
+from copy import deepcopy
 
 LENGTH = 10
 MINES = 20
 START = (0, 0)
 GOAL = (9, 9)
 PROB = 0.7 # Probability that agent will select the most optimal move
-MAX_RESETS = 30000 # Reset limit when searching for solution
+MAX_RESETS = 5000 # Reset limit when searching for solution
 
 def main():
     # Create field with mines
@@ -30,12 +31,16 @@ def main():
         print(f"Agent's map:\n{reference}")
     
 def search(agent, reference):
+    # Initialise solution
+    solution = None
+    goal = False
     # Save start time
     start = time()
     last_update = start
     # Initialise counts
     resets = 0
     longest_path = 0
+    cost = agent.field.length ** 2
     # End loop if time limit is exceeded
     while resets < MAX_RESETS:
         # Mark the current position of the agent on the reference field as H
@@ -61,10 +66,22 @@ def search(agent, reference):
         agent.move(move)
         # If agent has reached the goal state, return 0
         if agent.check_goal():
-            elapsed = time() - start
-            print(f"\nSolution found after {elapsed:.4f} seconds and {resets} resets:")
+            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):")
+            new_cost = reference.count_marker(1)
+            if new_cost < cost:
+                cost = new_cost
+                solution = deepcopy(reference)
             print(reference)
-            return True
+            # Reset game field
+            agent.field.reset()
+            # Reset reference field
+            reference.reset()
+            # Move agent to start
+            agent.move(START)
+            # Add to reset count
+            resets += 1
+            # Reset path
+            agent.path.clear()
         # If agent encountered mine or is stuck in a dead end
         elif agent.check_mine() == 1 or not options:
             # Add move to unsafe list
@@ -89,6 +106,9 @@ def search(agent, reference):
             last_update = time()
             longest_path = path_length
             print(f"Searching...    (Enter ctrl D to terminate search)\n{reference}")
+    if solution:
+        print(f"Most optimal solution (Cost={cost}) found after {time() - start}:\n{solution}")
+        return True
     print(f"\nNo path found after {round(elapsed)} seconds.")
     print(f"Resets: {resets}")
     return False
