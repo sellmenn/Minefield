@@ -74,7 +74,7 @@ def search(agent, reference):
         if agent.check_goal():
             # Obtain cost of state
             new_cost = reference.count_marker(1)
-            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):\n{reference}\n")
+            print(f"\nNew solution found(cost = {new_cost}):\n{reference}\n")
             # Save solution if cost is lowest so far
             if new_cost < cost:
                 cost = new_cost
@@ -96,18 +96,17 @@ def search(agent, reference):
             reset(agent, reference)
             resets += 1
         
-        # Update elapsed time
-        elapsed = time() - start
-        
         # Update terminal every second
         if time() - last_update > 1:
             last_update = time()
             print(f"Searching...\nCurrent position: {agent.position}\nActions: {actions}\n{reference}")
     
+    # Update elapsed time
+    elapsed = time() - start
     # If solution exists, return True, else return False
     if solution:
         print(f"Hidden Minefield:\n{agent.field}")
-        print(f"Most optimal solution (Cost={cost}) found after {(time() - start):.4f} seconds and {resets} resets:\n{solution}")
+        print(f"Most optimal solution (Cost={cost}) found after {elapsed:.4f} seconds and {resets} resets:\n{solution}")
         return True
     print(f"\nNo path found after {elapsed:.4f} seconds.")
     print(f"Resets: {resets}")
@@ -132,14 +131,10 @@ def informed_action(agent, actions):
 
 # Function to reset agent and reference field
 def reset(agent, reference):
-    # Reset game field
     agent.field.reset()
-    # Reset reference field
     reference.reset()
-    # Move agent to start
     agent.move(START)
-    # Reset path
-    agent.path = list()
+    agent.path.clear()
 
 if __name__ == "__main__":
     main()
