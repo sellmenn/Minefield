@@ -9,7 +9,7 @@ MINES = 20
 START = (0, 0)
 GOAL = (9, 9)
 PROB = 0.7 # Probability that agent will select the most optimal move
-MAX_RESETS = 5000 # Reset limit when searching for solution
+MAX_RESETS = 10000 # Reset limit when searching for solution
 
 def main():
     # Create field with mines
@@ -41,6 +41,8 @@ def search(agent, reference):
     resets = 0
     longest_path = 0
     cost = agent.field.length ** 2
+    # Lowest theoretically possible cost
+    lowest_cost = 2 * (LENGTH) - 2
     # End loop if limit is exceeded
     while resets < MAX_RESETS:
         # Mark the current position of the agent on the reference field as H
@@ -76,6 +78,8 @@ def search(agent, reference):
             if new_cost < cost:
                 cost = new_cost
                 solution = deepcopy(reference)
+                if cost == lowest_cost:
+                    break
             print(reference)
             # Reset agent and reference field
             reset(agent, reference)
@@ -90,8 +94,7 @@ def search(agent, reference):
             reference.mines.append(move)
             reset(agent, reference)
             resets += 1
-            
-        # Update elapsed time
+            # Update elapsed time
         elapsed = time() - start
         path_length = reference.count_marker(1)
         
@@ -103,7 +106,7 @@ def search(agent, reference):
     
     # If solution exists, return True, else return False
     if solution:
-        print(f"Most optimal solution (Cost={cost}) found after {(time() - start):.4f} seconds:\n{solution}")
+        print(f"Most optimal solution (Cost={cost}) found after {(time() - start):.4f} seconds and {resets} resets:\n{solution}")
         return True
     print(f"\nNo path found after {elapsed:.4f} seconds.")
     print(f"Resets: {resets}")
