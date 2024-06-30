@@ -43,13 +43,13 @@ The Field class includes instance methods to simulate a minefield. It accepts fo
 During initialization of a Field object, when create_field() is called:
 
 An empty table represented by lists is generated and stored in the map attribute, with empty coordinates represented as 0.
-Mines, represented by 'X', are stored in the map attribute, as well as in the mines attribute.
-When mark_field(coordinate, marker) is called:
+Mines, represented by 'X', are stored in the map attribute, as well as in their coordinates in the mines attribute.
 
+When mark_field(coordinate, marker) is called:
 The provided coordinate is marked with the marker in the corresponding position within the map attribute.
 In this project's implementation, an agent's path is represented by 1s.
-When reset_field() is called:
 
+When reset_field() is called:
 Within the map attribute, any coordinate that contains neither 0 nor 'X' is reset to 0 by calling the unmark_field function.
 
 ### solver.py
