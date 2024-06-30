@@ -23,11 +23,11 @@ def main():
         result = search(agent, reference)
     except EOFError:
         print("Search terminated.")
-    print(f"Hidden Minefield:\n{agent.field}")
     if result:
         print("Goal reached! Game ended.")
         return 0
     else:
+        print(f"Hidden Minefield:\n{agent.field}")
         print(f"Agent's map:\n{reference}")
     
 def search(agent, reference):
@@ -41,12 +41,13 @@ def search(agent, reference):
     resets = 0
     longest_path = 0
     cost = agent.field.length ** 2
-    # End loop if time limit is exceeded
+    # End loop if limit is exceeded
     while resets < MAX_RESETS:
         # Mark the current position of the agent on the reference field as H
         reference.mark_field(agent.position, "H")
         # Add current position to path
         agent.path.append(agent.position)
+
         # Obtain list of all possible actions from current position
         actions = agent.actions()
         options = list()
@@ -54,6 +55,7 @@ def search(agent, reference):
         for action in actions:
             if action not in agent.path:
                 options.append(actions[action])
+
         # With PROB probability, select the most optimal move from the list of moves in options. Else, select a random move.
         rand = choices([True, False], [PROB, 1 - PROB])[0]
         if rand == True and options:
@@ -64,25 +66,21 @@ def search(agent, reference):
         reference.mark_field(agent.position, 1)
         # Move agent to new position
         agent.move(move)
+
         # If agent has reached the goal state
         if agent.check_goal():
-            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):")
+            # Obtain cost of state
             new_cost = reference.count_marker(1)
-            # If solution is the most optimal, save solution
+            print(f"\nNew solution found after {elapsed:.4f} seconds and {resets} resets (cost = {new_cost}):")
+            # Save solution if cost is lowest seen
             if new_cost < cost:
                 cost = new_cost
                 solution = deepcopy(reference)
             print(reference)
-            # Reset game field
-            agent.field.reset()
-            # Reset reference field
-            reference.reset()
-            # Move agent to start
-            agent.move(START)
-            # Add to reset count
+            # Reset agent and reference field
+            reset(agent, reference)
             resets += 1
-            # Reset path
-            agent.path.clear()
+
         # If agent encountered mine or is stuck in a dead end
         elif agent.check_mine() == 1 or not options:
             # Add move to unsafe list
@@ -90,27 +88,23 @@ def search(agent, reference):
             # Add move to reference field
             reference.map[move[0]][move[1]] = "X"
             reference.mines.append(move)
-            # Reset game field
-            agent.field.reset()
-            # Reset reference field
-            reference.reset()
-            # Move agent to start
-            agent.move(START)
-            # Add to reset count
+            reset(agent, reference)
             resets += 1
-            # Reset path
-            agent.path.clear()
+            # Update elapsed time
         elapsed = time() - start
         path_length = reference.count_marker(1)
+        
         # Update terminal every second or if new longest path found
         if path_length > longest_path or time() - last_update > 1:
             last_update = time()
             longest_path = path_length
             print(f"Searching...    (Enter ctrl D to terminate search)\n{reference}")
+    
+    # If solution exists, return True, else return False
     if solution:
-        print(f"Most optimal solution (Cost={cost}) found after {time() - start}:\n{solution}")
+        print(f"Most optimal solution (Cost={cost}) found after {(time() - start):.4f} seconds:\n{solution}")
         return True
-    print(f"\nNo path found after {round(elapsed)} seconds.")
+    print(f"\nNo path found after {elapsed:.4f} seconds.")
     print(f"Resets: {resets}")
     return False
 
@@ -128,6 +122,17 @@ def informed_action(agent, actions):
         elif new_cost == cost:
             best = choices([action, best])[0]
     return best
+
+# Function to reset agent and reference field
+def reset(agent, reference):
+    # Reset game field
+    agent.field.reset()
+    # Reset reference field
+    reference.reset()
+    # Move agent to start
+    agent.move(START)
+    # Reset path
+    agent.path.clear()
 
 if __name__ == "__main__":
     main()
