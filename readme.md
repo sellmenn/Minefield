@@ -5,10 +5,10 @@ Minefield is a popular team-building game in which players have to navigate a ph
 
 ## HOW TO RUN
 
-Ensure all modules in requirements.txt have been installed. Simply use pip3 install -r requirements.txt in your terminal.
-Type python3 solver.py in your terminal and press Enter.
-The program defaults to a field with sides of 10 units, containing 20 mines.
-For configuration, modify the global variables in solver.py. Ensure that START and GOAL are coordinates within the field.
+1. Ensure all modules in requirements.txt have been installed. Simply use pip3 install -r requirements.txt in your terminal.
+2. Type python3 solver.py in your terminal and press Enter.
+3. The program defaults to a field with sides of 10 units, containing 20 mines.
+4. For configuration, modify the global variables in solver.py. Ensure that START and GOAL are coordinates within the field.
 
 ## PROJECT DESCRIPTION
 
