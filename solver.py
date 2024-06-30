@@ -5,7 +5,7 @@ from time import time
 from copy import deepcopy
 
 LENGTH = 10
-MINES = 25
+MINES = 20
 START = (0, 0)
 GOAL = (9, 9)
 PROB = 0.9 # Probability that agent will select the most optimal move
@@ -25,11 +25,8 @@ def main():
     reference = Field(length=LENGTH, mines=0, start=START, goal=GOAL)
     # Create agent object
     agent = Agent(game)
-    try:
-        # Search for path via reinforcement learning
-        result = search(agent, reference)
-    except EOFError:
-        print("Search terminated.")
+    # Search for path using reinforcement learning
+    result = search(agent, reference)
     if result:
         print("Solution found! Game ended.")
         return 0
@@ -62,6 +59,10 @@ def search(agent, reference):
         for action in actions:
             if actions[action] not in agent.path:
                 options.append(actions[action])
+        
+        # If unable to leave start
+        if agent.position == START and not options:
+            break
 
         # With PROB probability, select the most optimal move from the list of moves in options. Else, select a random move.
         rand = choices([True, False], [PROB, 1 - PROB])[0]
@@ -106,7 +107,7 @@ def search(agent, reference):
         if path_length > longest_path or time() - last_update > 1:
             last_update = time()
             longest_path = path_length
-            print(f"Searching...\nCurrent position: {agent.position}\nActions: {options}\nPath: {agent.path}    (Enter ctrl D to terminate search)\n{reference}")
+            print(f"Searching...\nCurrent position: {agent.position}\nActions: {options}\n{reference}")
     
     # If solution exists, return True, else return False
     if solution:
